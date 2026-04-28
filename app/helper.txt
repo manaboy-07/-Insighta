@@ -1,0 +1,249 @@
+ood call — switching tasks when you’re stuck is usually the fastest way forward.
+
+Let’s reset and focus on the **Web Portal (Phase 4)** in a clean, simple way so you don’t get overwhelmed again.
+
+---
+
+# 🧭 Phase 4 — Web Portal (What you’re actually building)
+
+You’re building a **Next.js app** that consumes your NestJS API.
+
+Think of it like:
+
+```txt
+Backend (NestJS) → API
+Frontend (Next.js) → UI for humans
+```
+
+---
+
+# 🚀 STEP 1 — Create Next.js Project (clean setup)
+
+Run:
+
+```bash
+npx create-next-app@latest insighta-web
+```
+
+When prompted, choose:
+
+* TypeScript: ✅ Yes
+* App Router: ✅ Yes
+* Tailwind: ✅ Yes (VERY IMPORTANT)
+* ESLint: ✅ Yes
+
+Then:
+
+```bash
+cd insighta-web
+npm run dev
+```
+
+---
+
+# 📦 STEP 2 — Install required packages
+
+These are enough for your entire portal:
+
+```bash
+npm install axios @tanstack/react-query
+```
+
+Optional but useful:
+
+```bash
+npm install js-cookie
+```
+
+---
+
+# 🧠 STEP 3 — Project structure (IMPORTANT)
+
+Keep it simple:
+
+```txt
+/app
+  /login
+  /dashboard
+  /profiles
+  /profiles/[id]
+  /search
+  /account
+
+/components
+  Navbar.tsx
+  ProfileCard.tsx
+  Loader.tsx
+
+/lib
+  api.ts
+```
+
+---
+
+# 🔌 STEP 4 — API helper (VERY IMPORTANT)
+
+Create:
+
+```ts
+// lib/api.ts
+import axios from "axios";
+
+export const api = axios.create({
+  baseURL: "http://localhost:3000",
+  withCredentials: true,
+});
+```
+
+---
+
+# 🔐 STEP 5 — Login Page (GitHub OAuth entry)
+
+```tsx
+"use client";
+
+import { api } from "@/lib/api";
+
+export default function LoginPage() {
+  const login = () => {
+    window.location.href = "http://localhost:3000/auth/github";
+  };
+
+  return (
+    <div className="flex h-screen items-center justify-center">
+      <button
+        onClick={login}
+        className="px-6 py-3 bg-black text-white rounded"
+      >
+        Login with GitHub
+      </button>
+    </div>
+  );
+}
+```
+
+---
+
+# 📊 STEP 6 — Dashboard (simple metrics)
+
+Example:
+
+```tsx
+"use client";
+
+import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
+
+export default function Dashboard() {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    api.get("/api/profiles").then((res) => setData(res.data));
+  }, []);
+
+  return (
+    <div className="p-6">
+      <h1 className="text-xl font-bold">Dashboard</h1>
+      <p>Total Profiles: {data?.total}</p>
+    </div>
+  );
+}
+```
+
+---
+
+# 📄 STEP 7 — Profiles Page (core requirement)
+
+You’ll reuse your backend:
+
+```tsx
+useEffect(() => {
+  api
+    .get("/api/profiles?page=1&limit=10", {
+      headers: {
+        "X-API-Version": "1",
+      },
+    })
+    .then((res) => setProfiles(res.data.data));
+}, []);
+```
+
+---
+
+# 🔎 STEP 8 — Search Page
+
+```ts
+api.get("/api/profiles/search?q=nigeria", {
+  headers: { "X-API-Version": "1" },
+});
+```
+
+---
+
+# 👤 STEP 9 — Profile Detail Page
+
+```ts
+api.get(`/api/profiles/${id}`, {
+  headers: { "X-API-Version": "1" },
+});
+```
+
+---
+
+# 🧠 KEY THINGS YOUR WEB PORTAL MUST SHOW
+
+✔ Login page (GitHub OAuth redirect)
+✔ Dashboard (metrics)
+✔ Profiles list (pagination + filters)
+✔ Profile detail page
+✔ Search page
+✔ Account page
+
+---
+Change the rwefresh timeline
+# ⚠️ IMPORTANT (YOU ALREADY BUILT THIS RIGHT)
+
+Your backend already supports:
+
+* pagination ✔
+* filters ✔
+* versioning ✔
+* search ✔
+* export ✔
+
+So frontend is just **UI wrapping your API**
+
+---
+
+# 💡 SIMPLE STRATEGY (DON’T OVERCOMPLICATE)
+
+For submission:
+
+### Focus ONLY on:
+
+✔ Profiles list page
+✔ Search page
+✔ Login page
+✔ Dashboard
+
+That’s enough to pass Phase 4 strongly.
+
+---
+
+# 🧘‍♂️ BREAK SUMMARY
+
+You just moved from:
+
+* CLI auth chaos 😵‍💫
+  to
+* clean frontend build 🧠
+
+---
+
+When you come back, I can help you:
+
+* make it look **like a real SaaS dashboard (Stripe-style UI)**
+* add **filters + pagination UI**
+* or connect login properly with cookies (important for grading)
+
+Just tell me 👍
