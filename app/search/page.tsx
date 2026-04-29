@@ -78,7 +78,6 @@ export default function SearchPage() {
 
   return (
     <div className="space-y-6">
-      {/* SEARCH */}
       <form
         onSubmit={handleSearch}
         className="flex flex-wrap gap-2 items-center"
@@ -148,7 +147,7 @@ export default function SearchPage() {
 
             <tbody>
               {data.map((p) => (
-                <tr key={p.id} className="border-t hover:bg-gray-50">
+                <tr key={p.id} className="border-t hover:bg-gray-600">
                   <td className="p-3 font-medium">{p.name}</td>
                   <td>{p.gender}</td>
                   <td>{p.age}</td>
