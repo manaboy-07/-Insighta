@@ -5,11 +5,11 @@ export const api = axios.create({
   baseURL,
   withCredentials: true,
 });
-// 🔍 REQUEST LOGGER
+
 api.interceptors.request.use((config) => {
   const fullUrl = `${config.baseURL}${config.url}`;
 
-  console.log("\n🚀 REQUEST:");
+  console.log("\n REQUEST:");
   console.log("URL:", fullUrl);
   console.log("METHOD:", config.method?.toUpperCase());
   console.log("PARAMS:", config.params);
@@ -27,7 +27,7 @@ api.interceptors.response.use(
     if (status === 401) {
       try {
         await axios.post(
-          "http://localhost:3000/auth/refresh",
+          `${baseURL}/auth/refresh`,
           {},
           { withCredentials: true },
         );
