@@ -6,10 +6,10 @@ export default function LoginPage() {
     window.location.href = `${baseURL}/auth/github`;
   };
   return (
-    <div className="flex h-screen items-center justify-center">
+    <div className="flex bg-gray-800 h-screen items-center justify-center">
       <button
         onClick={login}
-        className="px-6 pointer py-3 bg-black text-white rounded"
+        className="px-6 pointer py-3 cursor-pointer bg-black text-white rounded"
       >
         Login with github
       </button>

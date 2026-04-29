@@ -5,10 +5,9 @@ import { api } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default async function CreateProfile() {
+export default function CreateProfile() {
   const router = useRouter();
 
-  const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [name, setName] = useState("");
@@ -29,10 +28,9 @@ export default async function CreateProfile() {
           router.replace("/unauthorized");
           return;
         }
-
-        setUserRole(role);
       } catch (err) {
         router.replace("/login");
+        return;
       } finally {
         setLoading(false);
       }
@@ -61,6 +59,7 @@ export default async function CreateProfile() {
       router.push("/profiles");
     } catch (err) {
       console.error("Create failed:", err);
+      alert("Failed to create profile");
     }
   };
 
@@ -77,7 +76,7 @@ export default async function CreateProfile() {
       <div className="max-w-xl mx-auto p-6 space-y-6">
         <h1 className="text-2xl font-bold">Create Profile</h1>
 
-        <p className="text-sm text-gray-500">Admin-only action</p>
+        <p className="text-sm text-gray-600">Admin-only action</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -102,7 +101,7 @@ export default async function CreateProfile() {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+            className="w-full cursor-pointer bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
           >
             Create Profile
           </button>
