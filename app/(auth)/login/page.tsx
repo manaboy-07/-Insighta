@@ -7,7 +7,10 @@ export default function LoginPage() {
   };
   return (
     <div className="flex h-screen items-center justify-center">
-      <button onClick={login} className="px-6 py-3 bg-black text-white rounded">
+      <button
+        onClick={login}
+        className="px-6 pointer py-3 bg-black text-white rounded"
+      >
         Login with github
         {/* gihub image */}
       </button>
