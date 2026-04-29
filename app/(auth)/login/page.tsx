@@ -12,7 +12,6 @@ export default function LoginPage() {
         className="px-6 pointer py-3 bg-black text-white rounded"
       >
         Login with github
-        {/* gihub image */}
       </button>
     </div>
   );

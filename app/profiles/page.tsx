@@ -25,7 +25,6 @@ export default function Profiles() {
   const [next, setNext] = useState<string | null>(null);
   const [prev, setPrev] = useState<string | null>(null);
 
-  // ================= FILTERS =================
   const [filters, setFilters] = useState({
     age_group: "",
     country_id: "",
@@ -43,14 +42,13 @@ export default function Profiles() {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
-  // ================= FETCH =================
-  const fetchProfiles = async (pageNum = 1) => {
+  const fetchProfiles = async () => {
     setLoading(true);
 
     try {
       const res = await api.get("/api/profiles", {
         params: {
-          page: pageNum,
+          page,
           limit,
 
           ...Object.fromEntries(
@@ -76,12 +74,11 @@ export default function Profiles() {
     }
   };
 
+  const goNext = () => next && setPage((prev) => prev + 1);
+  const goPrev = () => prev && setPage((prev) => prev - 1);
   useEffect(() => {
-    fetchProfiles(1);
-  }, [limit]);
-
-  const goNext = () => next && fetchProfiles(page + 1);
-  const goPrev = () => prev && fetchProfiles(page - 1);
+    fetchProfiles();
+  }, [limit, page]);
 
   const exportCSV = async () => {
     try {
@@ -144,7 +141,7 @@ export default function Profiles() {
 
             {/* APPLY */}
             <button
-              onClick={() => fetchProfiles(1)}
+              onClick={() => fetchProfiles()}
               className="bg-blue-600 text-white px-4 py-2 rounded"
             >
               Apply
@@ -156,6 +153,15 @@ export default function Profiles() {
               className="bg-green-600 text-white px-4 py-2 rounded"
             >
               Export CSV
+            </button>
+            {/* CSV EXPORT */}
+            <button
+              onClick={() => {
+                router.push("/profiles/create");
+              }}
+              className="bg-green-600 text-white px-4 py-2 rounded"
+            >
+              +
             </button>
           </div>
         </div>

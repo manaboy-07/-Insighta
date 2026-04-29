@@ -5,7 +5,7 @@ import { api } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function CreateProfile() {
+export default async function CreateProfile() {
   const router = useRouter();
 
   const [userRole, setUserRole] = useState<string | null>(null);
