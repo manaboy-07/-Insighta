@@ -1,1 +1,1 @@
-export const baseURL = "http://localhost:3000";
+export const baseURL = "https://hng1-production-f8e7.up.railway.app";
