@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { api } from "@/lib/api";
 
 type Profile = {
@@ -15,9 +15,6 @@ type Profile = {
 };
 
 export default function SearchPage() {
-  // =====================
-  // STATE (SAFE INITIALS)
-  // =====================
   const [data, setData] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
@@ -30,12 +27,8 @@ export default function SearchPage() {
   const [next, setNext] = useState<string | null>(null);
   const [prev, setPrev] = useState<string | null>(null);
 
-  // =====================
-  // FETCH FUNCTION
-  // =====================
   const fetchData = async (pageNum = 1) => {
     setLoading(true);
-    setHasSearched(true);
 
     try {
       const res = await api.get("/api/profiles/search", {
@@ -51,7 +44,6 @@ export default function SearchPage() {
 
       const payload = res?.data;
 
-      // 🛡 SAFE GUARDS (CRASH PROOF)
       setData(payload?.data ?? []);
       setPage(payload?.page ?? 1);
       setTotalPages(payload?.total_pages ?? 1);
@@ -60,8 +52,6 @@ export default function SearchPage() {
       setPrev(payload?.links?.prev ?? null);
     } catch (err) {
       console.error("API ERROR:", err);
-
-      // fallback safe state
       setData([]);
       setNext(null);
       setPrev(null);
@@ -70,16 +60,9 @@ export default function SearchPage() {
     }
   };
 
-  // initial load
-  useEffect(() => {
-    fetchData(1);
-  }, []);
-
-  // =====================
-  // HANDLERS
-  // =====================
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: React.SubmitEvent) => {
     e.preventDefault();
+    setHasSearched(true);
     fetchData(1);
   };
 
@@ -93,17 +76,13 @@ export default function SearchPage() {
     fetchData(page - 1);
   };
 
-  // =====================
-  // UI
-  // =====================
   return (
     <div className="space-y-6">
-      {/* SEARCH + FILTERS */}
+      {/* SEARCH */}
       <form
         onSubmit={handleSearch}
         className="flex flex-wrap gap-2 items-center"
       >
-        {/* SEARCH INPUT */}
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -111,7 +90,6 @@ export default function SearchPage() {
           className="flex-1 min-w-200px px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
         />
 
-        {/* LIMIT */}
         <select
           value={limit}
           onChange={(e) => setLimit(Number(e.target.value))}
@@ -123,38 +101,37 @@ export default function SearchPage() {
           <option value={50}>50</option>
         </select>
 
-        {/* BUTTON */}
         <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
           Search
         </button>
       </form>
 
-      {/* LOADER */}
-      {loading && (
+      {/* BEFORE SEARCH */}
+      {!hasSearched && (
+        <div className="text-center py-20 text-gray-500">
+          <p className="text-lg font-medium">Try searching profiles</p>
+          <p className="text-sm">Use the search box above</p>
+        </div>
+      )}
+
+      {/* LOADING */}
+      {hasSearched && loading && (
         <div className="flex flex-col items-center justify-center py-16">
           <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-          <p className="text-gray-500 mt-3">Loading profiles...</p>
+          <p className="text-gray-500 mt-3">Searching...</p>
         </div>
       )}
 
-      {/* BEFORE SEARCH */}
-      {!loading && !hasSearched && (
-        <div className="text-center py-20 text-gray-500">
-          <p className="text-lg font-medium">Start searching profiles</p>
-          <p className="text-sm">Use the filters above</p>
-        </div>
-      )}
-
-      {/* EMPTY STATE */}
-      {!loading && hasSearched && (data?.length ?? 0) === 0 && (
+      {/* EMPTY */}
+      {hasSearched && !loading && data.length === 0 && (
         <div className="text-center py-20 text-gray-500">
           <p className="text-lg font-medium">No profiles found</p>
-          <p className="text-sm">Try a different search term</p>
+          <p className="text-sm">Try a different search</p>
         </div>
       )}
 
       {/* TABLE */}
-      {!loading && (data?.length ?? 0) > 0 && (
+      {hasSearched && !loading && data.length > 0 && (
         <div className="overflow-x-auto border rounded-lg">
           <table className="w-full text-sm">
             <thead className="bg-gray-100 text-gray-700">
@@ -170,8 +147,8 @@ export default function SearchPage() {
             </thead>
 
             <tbody>
-              {(data ?? []).map((p) => (
-                <tr key={p.id} className="border-t hover:bg-gray-500">
+              {data.map((p) => (
+                <tr key={p.id} className="border-t hover:bg-gray-50">
                   <td className="p-3 font-medium">{p.name}</td>
                   <td>{p.gender}</td>
                   <td>{p.age}</td>
@@ -187,12 +164,12 @@ export default function SearchPage() {
       )}
 
       {/* PAGINATION */}
-      {!loading && (data?.length ?? 0) > 0 && (
+      {hasSearched && !loading && data.length > 0 && (
         <div className="flex items-center justify-between pt-4">
           <button
             onClick={goPrev}
             disabled={!prev}
-            className="px-4 py-2 text-black bg-gray-200 rounded disabled:opacity-40"
+            className="px-4 py-2 bg-gray-900 rounded disabled:opacity-40"
           >
             ⬅ Previous
           </button>
@@ -204,7 +181,7 @@ export default function SearchPage() {
           <button
             onClick={goNext}
             disabled={!next}
-            className="px-4 py-2 text-black bg-gray-200 rounded disabled:opacity-40"
+            className="px-4 py-2 bg-gray-900 rounded disabled:opacity-40"
           >
             Next ➡
           </button>
