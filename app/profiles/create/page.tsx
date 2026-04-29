@@ -11,13 +11,9 @@ export default async function CreateProfile() {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // form state
   const [name, setName] = useState("");
   const [country, setCountry] = useState("");
 
-  // ===============================
-  // GET USER ROLE (AUTH CHECK)
-  // ===============================
   useEffect(() => {
     const checkRole = async () => {
       try {
@@ -45,10 +41,7 @@ export default async function CreateProfile() {
     checkRole();
   }, [router]);
 
-  // ===============================
-  // SUBMIT HANDLER
-  // ===============================
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
 
     try {
@@ -71,9 +64,6 @@ export default async function CreateProfile() {
     }
   };
 
-  // ===============================
-  // LOADING STATE
-  // ===============================
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -82,9 +72,6 @@ export default async function CreateProfile() {
     );
   }
 
-  // ===============================
-  // UI
-  // ===============================
   return (
     <Protected>
       <div className="max-w-xl mx-auto p-6 space-y-6">
@@ -92,9 +79,7 @@ export default async function CreateProfile() {
 
         <p className="text-sm text-gray-500">Admin-only action</p>
 
-        {/* FORM */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* NAME */}
           <div>
             <label className="text-sm font-medium">Name</label>
             <input
@@ -105,7 +90,6 @@ export default async function CreateProfile() {
             />
           </div>
 
-          {/* COUNTRY */}
           <div>
             <label className="text-sm font-medium">Country</label>
             <input
