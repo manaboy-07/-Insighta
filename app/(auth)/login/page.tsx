@@ -1,14 +1,14 @@
 "use client";
 import { baseURL } from "@/app/utils/baseUrl";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, Suspense } from "react";
+import { useEffect, Suspense, useRef } from "react";
 
-// 1. Create a "Inner" component for the logic
 function LoginLogic() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  // Use a ref to prevent double-execution in React Strict Mode
+  const processedRef = useRef(false);
 
-  // Helper function to generate a random string for the Verifier
   const generateRandomString = (length: number) => {
     const possible =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
@@ -19,7 +19,6 @@ function LoginLogic() {
     return text;
   };
 
-  // Helper function to hash the verifier (SHA-256) to create the Challenge
   const generateCodeChallenge = async (verifier: string) => {
     const encoder = new TextEncoder();
     const data = encoder.encode(verifier);
@@ -34,15 +33,27 @@ function LoginLogic() {
     const code = searchParams.get("code");
     const state = searchParams.get("state");
     const verifier = localStorage.getItem("pkce_verifier");
+    const loginSuccess = searchParams.get("login_success");
 
-    if (code && state === "web" && verifier) {
-      const url = `${baseURL}/auth/github/callback?code=${code}&state=${state}&code_verifier=${verifier}`;
-      window.location.href = url;
-    }
-
-    if (searchParams.get("login_success")) {
+    // 1. Handle returning from the final backend exchange
+    if (loginSuccess) {
       localStorage.removeItem("pkce_verifier");
       router.push("/dashboard");
+      return;
+    }
+
+    // 2. Handle returning from GitHub (Bounce phase)
+    if (code && state === "web" && verifier && !processedRef.current) {
+      processedRef.current = true; // Lock execution
+
+      // Construct final URL to send the code and the verifier to the backend
+      const finalUrl = new URL(`${baseURL}/auth/github/callback`);
+      finalUrl.searchParams.set("code", code);
+      finalUrl.searchParams.set("state", state);
+      finalUrl.searchParams.set("code_verifier", verifier);
+
+      // Final redirect to backend to set cookies and create session
+      window.location.href = finalUrl.toString();
     }
   }, [searchParams, router]);
 
@@ -51,7 +62,12 @@ function LoginLogic() {
     localStorage.setItem("pkce_verifier", verifier);
     const challenge = await generateCodeChallenge(verifier);
 
-    window.location.href = `${baseURL}/auth/github?state=web&code_challenge=${challenge}&code_challenge_method=S256`;
+    const loginUrl = new URL(`${baseURL}/auth/github`);
+    loginUrl.searchParams.set("state", "web");
+    loginUrl.searchParams.set("code_challenge", challenge);
+    loginUrl.searchParams.set("code_challenge_method", "S256");
+
+    window.location.href = loginUrl.toString();
   };
 
   return (
@@ -71,7 +87,6 @@ function LoginLogic() {
   );
 }
 
-// 2. The main page component wraps the logic in Suspense
 export default function LoginPage() {
   return (
     <div className="flex bg-gray-900 h-screen items-center justify-center">
