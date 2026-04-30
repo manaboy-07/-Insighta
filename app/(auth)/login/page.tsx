@@ -5,7 +5,6 @@ export default function LoginPage() {
   const login = () => {
     window.location.href = `${baseURL}/auth/github?state=web`;
   };
-
   return (
     <div className="flex bg-gray-800 h-screen items-center justify-center">
       <button
